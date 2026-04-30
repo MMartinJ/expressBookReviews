@@ -44,8 +44,14 @@ public_users.get('/author/:author',function (req, res) {
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const titleName = req.params.title;
+  const filteredTitle = Object.values(books).filter(book => book.title === titleName); 
+  if (filteredTitle.length > 0) {
+    res.status(200).send(JSON.stringify(filteredTitle, null, 4));
+  }
+  else{
+    res.status(400).send("Title not found!");
+  }
 });
 
 //  Get book review
