@@ -64,15 +64,28 @@ public_users.get('/isbn/:isbn',async function (req, res) {
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
   //Write your code here
   const authorName = req.params.author;
-  const filteredBooks = Object.values(books).filter(book => book.author === authorName); 
-  if (filteredBooks.length > 0) {
-    res.status(200).send(JSON.stringify(filteredBooks, null, 4));
-  }
-  else{
-    res.status(400).send("Author not found!");
+
+  try {
+    const getBooksByAuthor = new Promise((resolve, reject) => {
+        const filteredBooks = Object.values(books).filter(
+            (book) => book.author.toLowerCase() === authorName.toLowerCase()
+        );
+
+        if (filteredBooks.length > 0) {
+            resolve(filteredBooks);
+        } else {
+            reject({ status: 404, message: "Author not found" });
+        }
+    });
+
+    const authorBooks = await getBooksByAuthor;
+    res.status(200).send(JSON.stringify(authorBooks, null, 4));
+
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
   }
   
 });
